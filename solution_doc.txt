@@ -1,0 +1,59 @@
+Note: I am on an Ubuntu machine
+
+In this doc I will walk through the steps I've taken to solve the challenge question
+
+    1.  private-key decryption
+
+    ->  gpg --passphrase-file decryption-password.txt
+        --output stellar_wallet_key.txt --decrypt private-key.pgp
+
+        now later on I can read in my private key from stellar_wallet_key
+
+    2.  connect a node to stellar testnet
+
+        first I find the stellar-core installation instructions here:
+        https://github.com/stellar/stellar-core/blob/master/INSTALL.md
+
+        NOTE: This whole exercise could be done without a stellar node but
+        setting one up allowed me to be more confident using the api and allowed
+        me to verify that I have the correct private key
+
+        There is a docker image I could use or I could use the stellar-sdk
+        in my browser but since this is my first time interacting with the stellar network
+        I will elect to build it locally following the instructions at the bottom of the
+        link
+
+        -> connect to testnet using stellar-core_testnet.cfg
+
+        from inside stellar-core directory run:
+        -> stellar-core --conf docs/stellar-core_testnet.cfg new-db
+        -> stellar-core --conf docs/stellar-core_testnet.cfg run
+
+        using the following I can see my node is indeed synced
+        -> stellar-core --conf docs/stellar-core_testnet.cfg http-command 'info'
+
+        and I am connected to the "Test SDF Network ; September 2015"
+
+        from here it is easy to start validation and communicate with my stellar node
+        but these things are outside of the scope of the exercise and I will move on
+
+    3.  confirm the correct private key using convert-id
+
+        NOTE: stellar-core --conf docs/stellar-core_testnet.cfg = core
+
+        -> core convert-id //private-key from stellar_wallet_key.txt//
+
+        which gives GBGWMMGBIGD2XFL74F6ZC26UCCZ2NI7CPWKQ34NL5XTATZJMYOUFTQZ4
+        and that matches the address given in README so I know I have the correct private key!
+
+    4.  test Horizon api by creating new accounts and sending a transaction
+
+        -> create_new_account.js
+        -> check_balance.js
+        -> send_transaction_test.js
+
+        NOTE: I also confirmed that the fee will be deducted from the sender
+
+    5.  now send the transaction to the public key in README with memo ID set to 19
+
+        -> send_challenge_tx.js
